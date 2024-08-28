@@ -2,6 +2,16 @@
 
 <linker>
 
+	<assembly fullname="Assembly-CSharp">
+	    <type fullname="Tutorial.BaseClass" preserve="all"/>
+		<type fullname="Tutorial.TestEnum" preserve="all"/>
+		<type fullname="Tutorial.DerivedClass" preserve="all"/>
+		<type fullname="Tutorial.ICalc" preserve="all"/>
+		<type fullname="Tutorial.DerivedClassExtensions" preserve="all"/>
+		<type fullname="Tutorial.DerivedClass+TestEnumInner" preserve="all"/>
+		
+	</assembly>
+
 	<assembly fullname="mscorlib">
 	    <type fullname="System.Object" preserve="all"/>
 		<type fullname="System.Collections.Generic.List`1[System.Int32]" preserve="all"/>
@@ -33,7 +43,6 @@
 		<type fullname="UnityEngine.Light" preserve="all"/>
 		<type fullname="UnityEngine.Mathf" preserve="all"/>
 		<type fullname="UnityEngine.Debug" preserve="all"/>
-		<type fullname="UnityEngine.WaitForSeconds" preserve="all"/>
 		
 	</assembly>
 
@@ -47,25 +56,17 @@
 		
 	</assembly>
 
-	<assembly fullname="Assembly-CSharp">
-	    <type fullname="Tutorial.BaseClass" preserve="all"/>
-		<type fullname="Tutorial.TestEnum" preserve="all"/>
-		<type fullname="Tutorial.DerivedClass" preserve="all"/>
-		<type fullname="Tutorial.ICalc" preserve="all"/>
-		<type fullname="Tutorial.DerivedClassExtensions" preserve="all"/>
-		<type fullname="XLuaTest.LuaBehaviour" preserve="all"/>
-		<type fullname="XLuaTest.Pedding" preserve="all"/>
-		<type fullname="XLuaTest.MyStruct" preserve="all"/>
-		<type fullname="XLuaTest.MyEnum" preserve="all"/>
-		<type fullname="XLuaTest.NoGc" preserve="all"/>
-		<type fullname="XLuaTest.BaseTest" preserve="all"/>
-		<type fullname="XLuaTest.Foo1Parent" preserve="all"/>
-		<type fullname="XLuaTest.Foo2Parent" preserve="all"/>
-		<type fullname="XLuaTest.Foo1Child" preserve="all"/>
-		<type fullname="XLuaTest.Foo2Child" preserve="all"/>
-		<type fullname="XLuaTest.Foo" preserve="all"/>
-		<type fullname="XLuaTest.FooExtension" preserve="all"/>
-		<type fullname="Tutorial.DerivedClass+TestEnumInner" preserve="all"/>
+	<assembly fullname="UnityEngine.UI">
+	    <type fullname="UnityEngine.UI.InputField" preserve="all"/>
+		<type fullname="UnityEngine.UI.Button" preserve="all"/>
+		<type fullname="UnityEngine.UI.Text" preserve="all"/>
+		<type fullname="UnityEngine.UI.Image" preserve="all"/>
+		<type fullname="UnityEngine.UI.Toggle" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="UnityEngine.PhysicsModule">
+	    <type fullname="UnityEngine.Physics" preserve="all"/>
 		
 	</assembly>
 
