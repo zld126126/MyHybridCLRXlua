@@ -1,0 +1,4 @@
+[submodule "Packages/hybridclr_unity"]
+	path = Packages/hybridclr_unity
+	url = https://gitee.com/focus-creative-games/hybridclr_unity.git
+	branch = main
