@@ -12,7 +12,7 @@ namespace GameMain.Scripts
         private IEnumerator LoadGameDll()
         {
             SimpleLog.Log("[GameRoot::LoadGameDll] Start");
-            yield return ItorLoadData("hotfix.bytes", "hotfix", dict =>
+            yield return ItorLoadData("hotfix.bytes", dict =>
             {
                 if (dict == null)
                 {
@@ -79,7 +79,7 @@ namespace GameMain.Scripts
             SimpleLog.Log("[GameRoot::RunDll] Begin");
 
 #if !UNITY_EDITOR
-            yield return  ItorLoadData("base.bytes", "base", res =>
+            yield return  ItorLoadData("base.bytes", res =>
             {
                 res ??= new Dictionary<string, byte[]>();
                 LoadMetadataForAotAssembly(res);

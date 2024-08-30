@@ -1,0 +1,16 @@
+local function run()
+    print("<color=#FF0000>启动LUA执行流程</color>")
+    print(string.format("<color=#080008>平台:%s</color>", CS.UnityEngine.Application.platform))
+    print(string.format("<color=#080008>CPU:%s(%d核) </color>", CS.UnityEngine.SystemInfo.processorType,
+        CS.UnityEngine.SystemInfo.processorCount))
+    print(string.format("<color=#080008>版本:%s</color>", CS.UnityEngine.Application.unityVersion))
+    local go = CS.UnityEngine.GameObject.Find("GameRoot")
+    if go then
+        go.gameObject:AddComponent(typeof(CS.HotFix.Utils.Fps))
+    end
+    print("<color=#FF0000>结束LUA执行流程</color>")
+
+    require("TestPanel")
+end
+
+run()

@@ -9,7 +9,7 @@ namespace GameMain.Scripts
 {
     public partial class GameRoot
     {
-        private IEnumerator ItorLoadData(string fileName, string password, Action<Dictionary<string, byte[]>> callback)
+        private IEnumerator ItorLoadData(string fileName, Action<Dictionary<string, byte[]>> callback)
         {
             SimpleLog.Log($"[GameRoot::LoadData] {fileName}");
             byte[] bytes = null;
@@ -62,7 +62,7 @@ namespace GameMain.Scripts
 
             yield return null;
             using var ms = new MemoryStream(bytes, 0, bytes.Length, false, true);
-            using var output = new MemoryStream(bytes.Length);
+            using var output = ms;
             output.Seek(0, SeekOrigin.Begin);
             var dictBytes = new Dictionary<string, byte[]>();
             {

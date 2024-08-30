@@ -5,7 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GameMain.Scripts;
+using GameMain.Utils;
 using UnityEditor;
+using UnityEditor.Playables;
 using UnityEngine;
 
 namespace HybridCLR.Editor
@@ -77,6 +80,151 @@ namespace HybridCLR.Editor
             CompileDllCommand.CompileDll(target);
             CopyABAOTHotUpdateDlls(target);
             AssetDatabase.Refresh();
+        }
+        
+        private static void Generate(string srcDir, string name, List<string> fileList = null)
+        {
+            var dstFile = Path.Combine(Application.streamingAssetsPath, name).Replace('\\', '/');
+            if (File.Exists(dstFile))
+            {
+                File.Delete(dstFile);
+            }
+
+            var srcFullDir = Path.GetFullPath(srcDir).Replace('\\', '/');
+            if (!srcFullDir.EndsWith("/"))
+            {
+                srcFullDir += "/";
+            }
+
+            if (fileList == null || fileList.Count == 0)
+            {
+                var files = Directory.GetFiles(srcFullDir, "*", SearchOption.AllDirectories);
+                fileList = new List<string>(files.Length);
+                foreach (var file in files)
+                {
+                    if (file.EndsWith(".meta"))
+                    {
+                        continue;
+                    }
+
+                    var tmp = file.Replace('\\', '/').Replace(srcFullDir, "");
+                    fileList.Add(tmp);
+                }
+            }
+
+            if (fileList.Count == 0)
+            {
+                SimpleLog.Log($"[BuildPipeline::GenerateScripts] {srcDir} filelist is empty!!! {name}");
+                return;
+            }
+
+            using var ms = new MemoryStream();
+            using var bw = new BinaryWriter(ms);
+            bw.Write(fileList.Count);
+            foreach (var file in fileList)
+            {
+                var filePath = $"{srcDir}/{file}";
+                if (!File.Exists(filePath))
+                {
+                    filePath += ".dll";
+                }
+
+                if (!File.Exists(filePath))
+                {
+                    SimpleLog.Log($"[BuildPipeline::GenerateScripts]文件{filePath}不存在!");
+                    continue;
+                }
+
+                bw.Write(file);
+                var bytes = File.ReadAllBytes(filePath);
+                bw.Write(bytes.Length);
+                bw.Write(bytes);
+            }
+            
+            var outBuffer = ms.ToArray();
+            PathUtility.EnsureExistFileDirectory(dstFile);
+            File.WriteAllBytes(dstFile, outBuffer);
+        }
+        
+        private static void GenerateScripts(BuildTarget target)
+        {
+            var luaDir = Path.Combine(Application.dataPath, "Res", "lua");
+            Generate(luaDir, "lua.bytes");
+        }
+
+        [MenuItem("Build/BuildLuaAssetsAndCopyToStreamingAssets")]
+        public static void BuildLuaAssetsAndCopyToStreamingAssets()
+        {
+            BuildTarget target = EditorUserBuildSettings.activeBuildTarget;
+            GenerateScripts(target);
+        }
+
+        [MenuItem("Build/MyBuildAssetBundleByTarget")]
+        public static void MyBuildAssetBundleByTarget()
+        {
+            BuildTarget target = EditorUserBuildSettings.activeBuildTarget;
+            MyBuildAssetBundleByTarget(target);
+        }
+
+        private static bool CheckPlatform(BuildTarget target)
+        {
+            return target == EditorUserBuildSettings.activeBuildTarget;
+        }
+        
+        private static void MyBuildAssetBundleByTarget(BuildTarget target)
+        {
+            if (!CheckPlatform(target))
+            {
+                throw new Exception($"[BuildPipeline::CheckPlatform] 请先切到{target}平台再打包");
+            }
+
+            var outDir = GetAssetBundleOutputDirByTarget(target);
+            PathUtility.EnsureExistDirectory(outDir);
+
+            var buildTag = BuildAssetBundleOptions.DeterministicAssetBundle |
+                           BuildAssetBundleOptions.ChunkBasedCompression |
+                           BuildAssetBundleOptions.DisableLoadAssetByFileNameWithExtension;
+            var abs = new List<AssetBundleBuild>();
+            foreach (var _dir in Directory.GetDirectories("Assets/Res"))
+            {
+                var dir = _dir.Replace('\\', '/');
+                if (dir.EndsWith("lua"))
+                {
+                    continue;
+                }
+
+                var assets = new List<string>();
+                var abBuild = new AssetBundleBuild
+                {
+                    assetBundleName = dir.Replace("Assets/Res/", "")
+                };
+                var files = Directory.GetFiles(dir, "*.*", SearchOption.AllDirectories);
+                foreach (var file in files)
+                {
+                    if (file.EndsWith(".meta"))
+                    {
+                        continue;
+                    }
+
+                    assets.Add(file);
+                }
+
+                abBuild.assetNames = assets.Select(ToRelativeAssetPath).ToArray();
+                abs.Add(abBuild);
+            }
+
+            UnityEditor.BuildPipeline.BuildAssetBundles(outDir, abs.ToArray(), buildTag, target);
+
+            var streamingAssetPathDst = $"{Application.streamingAssetsPath}";
+            Directory.CreateDirectory(streamingAssetPathDst);
+
+            AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate | ImportAssetOptions.ImportRecursive);
+
+            foreach (var ab in abs)
+            {
+                AssetDatabase.CopyAsset(ToRelativeAssetPath($"{outDir}/{ab.assetBundleName}"),
+                    ToRelativeAssetPath($"{streamingAssetPathDst}/{ab.assetBundleName}"));
+            }
         }
 
         public static void CopyABAOTHotUpdateDlls(BuildTarget target)

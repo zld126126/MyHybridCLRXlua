@@ -1,0 +1,16 @@
+local function run()
+    CS.GameMain.Scripts.GameRoot.Instance:LoadAssetBundle("ui", function(ab)
+        local go = CS.UnityEngine.GameObject.Find("UIRoot")
+        local test = ab:LoadAsset("assets/res/ui/testpanel.prefab")
+        test = CS.UnityEngine.GameObject.Instantiate(test)
+        test.transform:SetParent(go.transform, false)
+
+        local performance = test.transform:Find("test"):GetComponent(typeof(CS.UnityEngine.UI.Button))
+        performance.onClick:RemoveAllListeners()
+        performance.onClick:AddListener(function()
+            require("Performance/Performance.lua.txt")
+        end)
+    end)
+end
+
+run()

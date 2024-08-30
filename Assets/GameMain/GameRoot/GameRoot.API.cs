@@ -14,9 +14,9 @@ namespace GameMain.Scripts
             StartCoroutine(ItorLoadAssetBundle(abName, callback));
         }
 
-        public void LoadData(string fileName, string password, Action<Dictionary<string, byte[]>> callback)
+        public void LoadData(string fileName, Action<Dictionary<string, byte[]>> callback)
         {
-            StartCoroutine(ItorLoadData(fileName, password, callback));
+            StartCoroutine(ItorLoadData(fileName, callback));
         }
     }
 }
