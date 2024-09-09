@@ -19,7 +19,7 @@ using LuaCSFunction = UniLua.CSharpFunctionDelegate;
 #else
 using LuaAPI = XLua.LuaDLL.Lua;
 using RealStatePtr = System.IntPtr;
-using LuaCSFunction = XLua.LuaDLL.lua_CSFunction;
+using LuaCSFunction = XLuaBase.lua_CSFunction;
 #endif
 
 namespace XLua
@@ -681,7 +681,7 @@ namespace XLua
 				string memberName = LuaAPI.lua_tostring(L, LuaAPI.xlua_upvalueindex(3));
 				bool isStatic = LuaAPI.lua_toboolean(L, LuaAPI.xlua_upvalueindex(4));
 				LuaCSFunction wrap = null;
-				//UnityEngine.Debug.Log(">>>>> " + type + " " + memberName);
+				//Log.Info(">>>>> " + type + " " + memberName);
 
 				switch (memberType)
 				{

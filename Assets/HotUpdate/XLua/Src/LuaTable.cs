@@ -13,7 +13,7 @@ using LuaCSFunction = UniLua.CSharpFunctionDelegate;
 #else
 using LuaAPI = XLua.LuaDLL.Lua;
 using RealStatePtr = System.IntPtr;
-using LuaCSFunction = XLua.LuaDLL.lua_CSFunction;
+using LuaCSFunction = XLuaBase.lua_CSFunction;
 #endif
 
 using System;
@@ -279,20 +279,14 @@ namespace XLua
             var L = luaEnv.L;
             var translator = luaEnv.translator;
             int oldTop = LuaAPI.lua_gettop(L);
-            try
+            LuaAPI.lua_getref(L, luaReference);
+            LuaAPI.lua_pushnil(L);
+            while (LuaAPI.lua_next(L, -2) != 0)
             {
-                LuaAPI.lua_getref(L, luaReference);
-                LuaAPI.lua_pushnil(L);
-                while (LuaAPI.lua_next(L, -2) != 0)
-                {
-                    yield return translator.GetObject(L, -2);
-                    LuaAPI.lua_pop(L, 1);
-                }
+                yield return translator.GetObject(L, -2);
+                LuaAPI.lua_pop(L, 1);
             }
-            finally
-            {
-                LuaAPI.lua_settop(L, oldTop);
-            }
+            LuaAPI.lua_settop(L, oldTop);
         }
 
 #if THREAD_SAFE || HOTFIX_ENABLE
@@ -303,25 +297,19 @@ namespace XLua
             var L = luaEnv.L;
             var translator = luaEnv.translator;
             int oldTop = LuaAPI.lua_gettop(L);
-            try
+            LuaAPI.lua_getref(L, luaReference);
+            LuaAPI.lua_pushnil(L);
+            while (LuaAPI.lua_next(L, -2) != 0)
             {
-                LuaAPI.lua_getref(L, luaReference);
-                LuaAPI.lua_pushnil(L);
-                while (LuaAPI.lua_next(L, -2) != 0)
+                if (translator.Assignable<T>(L, -2))
                 {
-                    if (translator.Assignable<T>(L, -2))
-                    {
-                        T v;
-                        translator.Get(L, -2, out v);
-                        yield return v;
-                    }
-                    LuaAPI.lua_pop(L, 1);
+                    T v;
+                    translator.Get(L, -2, out v);
+                    yield return v;
                 }
+                LuaAPI.lua_pop(L, 1);
             }
-            finally
-            {
-                LuaAPI.lua_settop(L, oldTop);
-            }
+            LuaAPI.lua_settop(L, oldTop);
         }
 
         [Obsolete("use no boxing version: Get<TKey, TValue> !")]

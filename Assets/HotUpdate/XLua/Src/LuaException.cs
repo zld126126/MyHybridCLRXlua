@@ -7,6 +7,7 @@
 */
 
 using System;
+using UnityEngine;
 
 namespace XLua
 {
@@ -14,6 +15,8 @@ namespace XLua
     public class LuaException : Exception
     {
         public LuaException(string message) : base(message)
-        {}
+        {
+            
+        }
     }
 }

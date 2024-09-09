@@ -6,7 +6,6 @@ public class AOTGenericReferences : UnityEngine.MonoBehaviour
 	public static readonly IReadOnlyList<string> PatchedAOTAssemblyList = new List<string>
 	{
 		"System.Core.dll",
-		"UnityEngine.AssetBundleModule.dll",
 		"UnityEngine.CoreModule.dll",
 		"mscorlib.dll",
 	};
@@ -356,12 +355,9 @@ public class AOTGenericReferences : UnityEngine.MonoBehaviour
 		// System.Collections.Generic.List<object> System.Linq.Enumerable.ToList<object>(System.Collections.Generic.IEnumerable<object>)
 		// System.Collections.Generic.IEnumerable<object> System.Linq.Enumerable.Where<object>(System.Collections.Generic.IEnumerable<object>,System.Func<object,bool>)
 		// System.Collections.Generic.IEnumerable<object> System.Linq.Enumerable.Iterator<object>.Select<object>(System.Func<object,object>)
-		// System.IntPtr System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate<object>(object)
-		// object UnityEngine.AssetBundle.LoadAsset<object>(string)
 		// object UnityEngine.Component.GetComponent<object>()
 		// object UnityEngine.GameObject.AddComponent<object>()
 		// object UnityEngine.GameObject.GetComponent<object>()
-		// object UnityEngine.Object.Instantiate<object>(object)
 		// UnityEngine.AsyncInstantiateOperation<object> UnityEngine.Object.InstantiateAsync<object>(object)
 		// UnityEngine.AsyncInstantiateOperation<object> UnityEngine.Object.InstantiateAsync<object>(object,UnityEngine.Transform)
 		// UnityEngine.AsyncInstantiateOperation<object> UnityEngine.Object.InstantiateAsync<object>(object,UnityEngine.Transform,UnityEngine.Vector3,UnityEngine.Quaternion)

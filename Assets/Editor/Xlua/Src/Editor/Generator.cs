@@ -104,15 +104,23 @@ namespace CSObjectWrapEditor
         public XLuaTemplate TemplateCommon;
     }
 
-    public static class Generator
+    public class Generator
     {
-        static LuaEnv luaenv = new LuaEnv();
+        static LuaEnv luaenv = null;
         static List<string> OpMethodNames = new List<string>() { "op_Addition", "op_Subtraction", "op_Multiply", "op_Division", "op_Equality", "op_UnaryNegation", "op_LessThan", "op_LessThanOrEqual", "op_Modulus",
             "op_BitwiseAnd", "op_BitwiseOr", "op_ExclusiveOr", "op_OnesComplement", "op_LeftShift", "op_RightShift"};
         private static XLuaTemplates templateRef;
 
-        static Generator()
+        static void Init()
         {
+            if (luaenv == null)
+            {
+                luaenv = new LuaEnv();
+            }
+            else
+            {
+                return;
+            }
 #if !XLUA_GENERAL
             TemplateRef template_ref = ScriptableObject.CreateInstance<TemplateRef>();
 
@@ -369,7 +377,7 @@ namespace CSObjectWrapEditor
                 .Where(prop => prop.GetIndexParameters().Length == 0 && prop.CanWrite && (prop.GetSetMethod() != null) && prop.Name != "Item" && !isObsolete(prop) && !isObsolete(prop.GetSetMethod()) && !isMemberInBlackList(prop) && !isMemberInBlackList(prop.GetSetMethod())).Select(prop => new { prop.Name, IsStatic = prop.GetSetMethod().IsStatic, Type = prop.PropertyType, IsProperty = true })
                 .Concat(
                     type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.IgnoreCase | BindingFlags.DeclaredOnly)
-                    .Where(field => !isObsolete(field) && !isMemberInBlackList(field) && !field.IsInitOnly && !field.IsLiteral)
+                    .Where(field => !isObsolete(field) && !isMemberInBlackList(field) && !isMemberReadOnly(field) && !field.IsInitOnly && !field.IsLiteral)
                     .Select(field => new { field.Name, field.IsStatic, Type = field.FieldType, IsProperty = false })
                 ).Where(info => !IsDoNotGen(type, info.Name))/*.Where(setter => !typeof(Delegate).IsAssignableFrom(setter.Type))*/.ToList());
 
@@ -546,6 +554,10 @@ namespace CSObjectWrapEditor
             return false;
         }
 
+        static bool isMemberReadOnly(MemberInfo mb)
+        {
+            return isDefined(mb, typeof(XluaReadOnlyAttribute));
+        }
         static bool isMethodInBlackList(MethodBase mb)
         {
             if (isDefined(mb, typeof(BlackListAttribute))) return true;
@@ -590,6 +602,7 @@ namespace CSObjectWrapEditor
         static Dictionary<string, LuaFunction> templateCache = new Dictionary<string, LuaFunction>();
         static void GenOne(Type type, Action<Type, LuaTable> type_info_getter, XLuaTemplate templateAsset, StreamWriter textWriter)
         {
+            Init();
             if (isObsolete(type)) return;
             LuaFunction template;
             if (!templateCache.TryGetValue(templateAsset.name, out template))
@@ -629,6 +642,8 @@ namespace CSObjectWrapEditor
 
         static void GenEnumWrap(IEnumerable<Type> types, string save_path)
         {
+            Init();
+            
             string filePath = save_path + "EnumWrap.cs";
             StreamWriter textWriter = new StreamWriter(filePath, false, Encoding.UTF8);
             
@@ -895,7 +910,7 @@ namespace CSObjectWrapEditor
             return false;
         }
 
-        static bool HasFlag(this HotfixFlag toCheck, HotfixFlag flag)
+        public static bool HasFlag(HotfixFlag toCheck, HotfixFlag flag)
         {
             return (toCheck != HotfixFlag.Stateless) && ((toCheck & flag) == flag);
         }
@@ -1040,13 +1055,27 @@ namespace CSObjectWrapEditor
         }
 
 #if !XLUA_GENERAL
-        static void clear(string path)
+        static void clear(string path, bool bForce = true)
         {
             if (Directory.Exists(path))
             {
                 Directory.Delete(path, true);
-                AssetDatabase.DeleteAsset(path.Substring(path.IndexOf("Assets") + "Assets".Length));
 
+                var newPath = path.Replace('\\', '/');
+                if (newPath.EndsWith("/"))
+                {
+                    newPath = newPath.Substring(0, newPath.Length - 1);
+                }
+                newPath += ".meta";
+
+                if (File.Exists(newPath))
+                {
+                    File.Delete(newPath);
+                }
+            }
+
+            if (bForce)
+            {
                 AssetDatabase.Refresh();
             }
         }
@@ -1650,6 +1679,10 @@ namespace CSObjectWrapEditor
         [MenuItem("XLua/Generate Code", false, 1)]
         public static void GenAll()
         {
+            Init();
+
+            clear(GeneratorConfig.common_path, false);
+
 #if UNITY_2018 && (UNITY_EDITOR_WIN || UNITY_EDITOR_OSX)
             if (File.Exists("./Tools/MonoBleedingEdge/bin/mono.exe"))
             {
@@ -1670,8 +1703,11 @@ namespace CSObjectWrapEditor
             GenCodeForClass();
             GenLuaRegister();
             callCustomGen();
-            Debug.Log("finished! use " + (DateTime.Now - start).TotalMilliseconds + " ms");
             AssetDatabase.Refresh();
+
+            EditorUtility.RequestScriptReload();
+
+            Debug.Log("finished! use " + (DateTime.Now - start).TotalMilliseconds + " ms");
         }
 
 #if UNITY_EDITOR_OSX || UNITY_EDITOR_WIN
@@ -1734,13 +1770,15 @@ namespace CSObjectWrapEditor
         [MenuItem("XLua/Clear Generated Code", false, 2)]
         public static void ClearAll()
         {
-            clear(GeneratorConfig.common_path);
+            clear(GeneratorConfig.common_path, true);
         }
 
         public delegate IEnumerable<CustomGenTask> GetTasks(LuaEnv lua_env, UserConfig user_cfg);
 
         public static void CustomGen(string template_src, GetTasks get_tasks)
         {
+            Init();
+
             GetGenConfig(XLua.Utils.GetAllTypes());
 
             LuaFunction template = XLua.TemplateEngine.LuaTemplate.Compile(luaenv,
@@ -1818,7 +1856,7 @@ namespace CSObjectWrapEditor
         }
 #if !XLUA_GENERAL
         [UnityEditor.Callbacks.PostProcessBuild(1)]
-        public static void CheckGenerate(BuildTarget target, string pathToBuiltProject)
+        public static void CheckGenrate(BuildTarget target, string pathToBuiltProject)
         {
             if (EditorApplication.isCompiling || Application.isPlaying)
             {
@@ -1826,7 +1864,7 @@ namespace CSObjectWrapEditor
             }
             if (!DelegateBridge.Gen_Flag)
             {
-                throw new InvalidOperationException("Code has not been generated, may be not work in phone!");
+                throw new InvalidOperationException("Code has not been genrated, may be not work in phone!");
             }
         }
 #endif

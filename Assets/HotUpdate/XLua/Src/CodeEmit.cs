@@ -20,7 +20,7 @@ using LuaCSFunction = UniLua.CSharpFunctionDelegate;
 #else
 using LuaAPI = XLua.LuaDLL.Lua;
 using RealStatePtr = System.IntPtr;
-using LuaCSFunction = XLua.LuaDLL.lua_CSFunction;
+using LuaCSFunction = XLuaBase.lua_CSFunction;
 #endif
 
 namespace XLua
@@ -1573,7 +1573,7 @@ namespace XLua
         {
             if (type.IsValueType && !type.IsPrimitive && !type.IsEnum() && type != typeof(decimal))
             {
-                //UnityEngine.Debug.LogWarning("-----------------emit update:" + type);
+                //Log.Warn("-----------------emit update:" + type);
                 il.Emit(OpCodes.Ldloc, translator);
                 il.Emit(OpCodes.Ldloc, L);
                 il.Emit(OpCodes.Ldc_I4, luaIndex);

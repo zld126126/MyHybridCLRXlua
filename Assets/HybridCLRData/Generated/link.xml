@@ -1,9 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <linker>
-  <assembly fullname="HybridCLR.Runtime">
-    <type fullname="HybridCLR.HomologousImageMode" preserve="all" />
-    <type fullname="HybridCLR.LoadImageErrorCode" preserve="all" />
-    <type fullname="HybridCLR.RuntimeApi" preserve="all" />
+  <assembly fullname="GameMain">
+    <type fullname="GameMain.Scripts.GameRoot" preserve="all" />
+    <type fullname="GameMain.Scripts.Performance.Performance" preserve="all" />
+    <type fullname="GameMain.Scripts.Performance.PerformanceSetting" preserve="all" />
+    <type fullname="GameMain.Scripts.SimpleLog" preserve="all" />
+    <type fullname="XLuaBase.Lua" preserve="all" />
+    <type fullname="XLuaBase.lua_CSFunction" preserve="all" />
   </assembly>
   <assembly fullname="StompyRobot.SRDebugger">
     <type fullname="SRDebug" preserve="all" />
@@ -36,10 +39,6 @@
     <type fullname="UnityEngine.AnimationClip" preserve="all" />
     <type fullname="UnityEngine.AnimationEvent" preserve="all" />
   </assembly>
-  <assembly fullname="UnityEngine.AssetBundleModule">
-    <type fullname="UnityEngine.AssetBundle" preserve="all" />
-    <type fullname="UnityEngine.AssetBundleCreateRequest" preserve="all" />
-  </assembly>
   <assembly fullname="UnityEngine.CoreModule">
     <type fullname="Unity.Collections.NativeArray`1" preserve="all" />
     <type fullname="Unity.Profiling.ProfilerCategory" preserve="all" />
@@ -48,7 +47,6 @@
     <type fullname="Unity.Profiling.ProfilerRecorderSample" preserve="all" />
     <type fullname="UnityEngine.AnimationCurve" preserve="all" />
     <type fullname="UnityEngine.Application" preserve="all" />
-    <type fullname="UnityEngine.Application/LogCallback" preserve="all" />
     <type fullname="UnityEngine.AsyncInstantiateOperation`1" preserve="all" />
     <type fullname="UnityEngine.AsyncOperation" preserve="all" />
     <type fullname="UnityEngine.BatteryStatus" preserve="all" />
@@ -94,7 +92,6 @@
     <type fullname="UnityEngine.Random" preserve="all" />
     <type fullname="UnityEngine.Ray" preserve="all" />
     <type fullname="UnityEngine.Ray2D" preserve="all" />
-    <type fullname="UnityEngine.Rect" preserve="all" />
     <type fullname="UnityEngine.RectOffset" preserve="all" />
     <type fullname="UnityEngine.RectTransform" preserve="all" />
     <type fullname="UnityEngine.Renderer" preserve="all" />
@@ -137,10 +134,8 @@
   </assembly>
   <assembly fullname="UnityEngine.IMGUIModule">
     <type fullname="UnityEngine.Event" preserve="all" />
-    <type fullname="UnityEngine.GUI" preserve="all" />
     <type fullname="UnityEngine.GUILayout" preserve="all" />
     <type fullname="UnityEngine.GUILayoutOption" preserve="all" />
-    <type fullname="UnityEngine.GUISkin" preserve="all" />
     <type fullname="UnityEngine.GUIStyle" preserve="all" />
     <type fullname="UnityEngine.GUIStyleState" preserve="all" />
     <type fullname="UnityEngine.TextClipping" preserve="all" />
@@ -226,16 +221,6 @@
     <type fullname="UnityEngine.UI.Toggle/ToggleTransition" preserve="all" />
     <type fullname="UnityEngine.UI.ToggleGroup" preserve="all" />
   </assembly>
-  <assembly fullname="UnityEngine.UnityWebRequestAssetBundleModule">
-    <type fullname="UnityEngine.Networking.DownloadHandlerAssetBundle" preserve="all" />
-    <type fullname="UnityEngine.Networking.UnityWebRequestAssetBundle" preserve="all" />
-  </assembly>
-  <assembly fullname="UnityEngine.UnityWebRequestModule">
-    <type fullname="UnityEngine.Networking.DownloadHandler" preserve="all" />
-    <type fullname="UnityEngine.Networking.UnityWebRequest" preserve="all" />
-    <type fullname="UnityEngine.Networking.UnityWebRequest/Result" preserve="all" />
-    <type fullname="UnityEngine.Networking.UnityWebRequestAsyncOperation" preserve="all" />
-  </assembly>
   <assembly fullname="mscorlib">
     <type fullname="System.Action" preserve="all" />
     <type fullname="System.Action`1" preserve="all" />
@@ -273,7 +258,6 @@
     <type fullname="System.Collections.ObjectModel.ReadOnlyCollection`1" preserve="all" />
     <type fullname="System.Comparison`1" preserve="all" />
     <type fullname="System.Convert" preserve="all" />
-    <type fullname="System.DateTime" preserve="all" />
     <type fullname="System.Decimal" preserve="all" />
     <type fullname="System.Delegate" preserve="all" />
     <type fullname="System.Diagnostics.DebuggableAttribute" preserve="all" />
@@ -292,16 +276,7 @@
     <type fullname="System.IAsyncResult" preserve="all" />
     <type fullname="System.IDisposable" preserve="all" />
     <type fullname="System.IFormatProvider" preserve="all" />
-    <type fullname="System.IO.BinaryReader" preserve="all" />
-    <type fullname="System.IO.Directory" preserve="all" />
-    <type fullname="System.IO.DirectoryInfo" preserve="all" />
     <type fullname="System.IO.File" preserve="all" />
-    <type fullname="System.IO.FileInfo" preserve="all" />
-    <type fullname="System.IO.FileSystemInfo" preserve="all" />
-    <type fullname="System.IO.MemoryStream" preserve="all" />
-    <type fullname="System.IO.Path" preserve="all" />
-    <type fullname="System.IO.SeekOrigin" preserve="all" />
-    <type fullname="System.IO.Stream" preserve="all" />
     <type fullname="System.Int16" preserve="all" />
     <type fullname="System.Int32" preserve="all" />
     <type fullname="System.Int64" preserve="all" />
@@ -339,9 +314,6 @@
     <type fullname="System.Runtime.CompilerServices.IteratorStateMachineAttribute" preserve="all" />
     <type fullname="System.Runtime.CompilerServices.RuntimeCompatibilityAttribute" preserve="all" />
     <type fullname="System.Runtime.CompilerServices.RuntimeHelpers" preserve="all" />
-    <type fullname="System.Runtime.InteropServices.CallingConvention" preserve="all" />
-    <type fullname="System.Runtime.InteropServices.Marshal" preserve="all" />
-    <type fullname="System.Runtime.InteropServices.UnmanagedFunctionPointerAttribute" preserve="all" />
     <type fullname="System.RuntimeFieldHandle" preserve="all" />
     <type fullname="System.RuntimeTypeHandle" preserve="all" />
     <type fullname="System.SByte" preserve="all" />

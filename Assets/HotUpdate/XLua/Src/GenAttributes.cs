@@ -47,6 +47,11 @@ namespace XLua
 
     }
 
+    public class XluaReadOnlyAttribute : Attribute
+    {
+
+    }
+
     [Flags]
     public enum OptimizeFlag
     {

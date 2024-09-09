@@ -13,12 +13,13 @@ using LuaCSFunction = UniLua.CSharpFunctionDelegate;
 #else
 using LuaAPI = XLua.LuaDLL.Lua;
 using RealStatePtr = System.IntPtr;
-using LuaCSFunction = XLua.LuaDLL.lua_CSFunction;
+using LuaCSFunction = XLuaBase.lua_CSFunction;
 #endif
 
 using System.Collections.Generic;
 using System;
 using System.Reflection;
+using UnityEngine;
 
 namespace XLua
 {
@@ -183,7 +184,7 @@ namespace XLua
                 if (method.IsDefined(typeof(ObsoleteAttribute), true))
                 {
                     ObsoleteAttribute info = Attribute.GetCustomAttribute(method, typeof(ObsoleteAttribute)) as ObsoleteAttribute;
-                    UnityEngine.Debug.LogWarning("Obsolete Method [" + method.DeclaringType.ToString() + "." + method.Name + "]: " + info.Message);
+                    Debug.Log("Obsolete Method [" + method.DeclaringType.ToString() + "." + method.Name + "]: " + info.Message);
                 } 
 #endif
                 object target = null;
@@ -209,7 +210,7 @@ namespace XLua
 
                 for (int i = 0; i < castArray.Length; i++)
                 {
-                    //UnityEngine.Debug.Log("inPos:" + inPosArray[i]);
+                    //Log.Info("inPos:" + inPosArray[i]);
                     if (luaStackPos > luaTop) //after check
                     {
                         if (paramsType != null && i == castArray.Length - 1)
@@ -233,7 +234,7 @@ namespace XLua
                         }
                         luaStackPos++;
                     }
-                    //UnityEngine.Debug.Log("value:" + args[inPosArray[i]]);
+                    //Log.Info("value:" + args[inPosArray[i]]);
                 }
 
                 object ret = null;
@@ -336,7 +337,7 @@ namespace XLua
 
         public LuaCSFunction GetConstructorWrap(Type type)
         {
-            //UnityEngine.Debug.LogWarning("GetConstructor:" + type);
+            //Log.Warn("GetConstructor:" + type);
             if (!constructorCache.ContainsKey(type))
             {
                 var constructors = type.GetConstructors();
@@ -401,7 +402,7 @@ namespace XLua
 
         public LuaCSFunction GetMethodWrap(Type type, string methodName)
         {
-            //UnityEngine.Debug.LogWarning("GetMethodWrap:" + type + " " + methodName);
+            //Log.Warn("GetMethodWrap:" + type + " " + methodName);
             if (!methodsCache.ContainsKey(type))
             {
                 methodsCache[type] = new Dictionary<string, LuaCSFunction>();
@@ -439,7 +440,7 @@ namespace XLua
 
         public LuaCSFunction GetDelegateWrap(Type type)
         {
-            //UnityEngine.Debug.LogWarning("GetDelegateWrap:" + type );
+            //Log.Warn("GetDelegateWrap:" + type );
             if (!typeof(Delegate).IsAssignableFrom(type))
             {
                 return null;

@@ -82,6 +82,22 @@ namespace HybridCLR.Editor
             AssetDatabase.Refresh();
         }
         
+        private static void GenerateScripts(BuildTarget target, bool compileDll = true)
+        {
+            var hotDllSrcDir = SettingsUtil.GetHotUpdateDllsOutputDirByTarget(target);
+            if (compileDll)
+            {
+                CompileDllCommand.CompileDll(target);
+            }
+            Generate(hotDllSrcDir, "hotfix.bytes", SettingsUtil.HotUpdateAssemblyFilesIncludePreserved);
+
+            var aotDllDir = SettingsUtil.GetAssembliesPostIl2CppStripDir(target);
+            Generate(aotDllDir, "base.bytes", SettingsUtil.AOTAssemblyNames);
+
+            var luaDir = Path.Combine(Application.dataPath, "Res", "lua");
+            Generate(luaDir, "lua.bytes");
+        }
+        
         private static void Generate(string srcDir, string name, List<string> fileList = null)
         {
             var dstFile = Path.Combine(Application.streamingAssetsPath, name).Replace('\\', '/');
@@ -145,25 +161,13 @@ namespace HybridCLR.Editor
             PathUtility.EnsureExistFileDirectory(dstFile);
             File.WriteAllBytes(dstFile, outBuffer);
         }
-        
-        private static void GenerateScripts(BuildTarget target)
-        {
-            var luaDir = Path.Combine(Application.dataPath, "Res", "lua");
-            Generate(luaDir, "lua.bytes");
-        }
 
-        [MenuItem("Build/BuildLuaAssetsAndCopyToStreamingAssets")]
-        public static void BuildLuaAssetsAndCopyToStreamingAssets()
+        [MenuItem("Build/BuildHybridClrXlua")]
+        public static void BuildHybridClrXlua()
         {
             BuildTarget target = EditorUserBuildSettings.activeBuildTarget;
+            GenerateLuaAssets(target);
             GenerateScripts(target);
-        }
-
-        [MenuItem("Build/MyBuildAssetBundleByTarget")]
-        public static void MyBuildAssetBundleByTarget()
-        {
-            BuildTarget target = EditorUserBuildSettings.activeBuildTarget;
-            MyBuildAssetBundleByTarget(target);
         }
 
         private static bool CheckPlatform(BuildTarget target)
@@ -171,7 +175,7 @@ namespace HybridCLR.Editor
             return target == EditorUserBuildSettings.activeBuildTarget;
         }
         
-        private static void MyBuildAssetBundleByTarget(BuildTarget target)
+        private static void GenerateLuaAssets(BuildTarget target)
         {
             if (!CheckPlatform(target))
             {

@@ -66,7 +66,7 @@
 		
 	</assembly>
 
-	<assembly fullname="HotUpdate">
+	<assembly fullname="Assembly-CSharp">
 	    <type fullname="HotFix.Performance.Performance" preserve="all"/>
 		<type fullname="HotFix.Utils.Monitor" preserve="all"/>
 		<type fullname="HotFix.Utils.Fps" preserve="all"/>

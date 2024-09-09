@@ -13,8 +13,12 @@ using LuaCSFunction = UniLua.CSharpFunctionDelegate;
 #else
 using LuaAPI = XLua.LuaDLL.Lua;
 using RealStatePtr = System.IntPtr;
-using LuaCSFunction = XLua.LuaDLL.lua_CSFunction;
+using LuaCSFunction = XLuaBase.lua_CSFunction;
 #endif
+using System.Text;
+using GameMain.Scripts;
+using GameMain.Utils;
+using UnityEngine;
 
 namespace XLua
 {
@@ -577,7 +581,7 @@ namespace XLua
                 {
                     return LuaAPI.luaL_error(L, "#2 param need a System.Type!");
                 }
-                //UnityEngine.Debug.Log("============================load type by __index:" + type);
+                //Log.Info("============================load type by __index:" + type);
                 //translator.TryDelayWrapLoader(L, type);
                 translator.GetTypeId(L, type);
                 LuaAPI.lua_pushvalue(L, 2);
@@ -605,28 +609,30 @@ namespace XLua
             try
             {
                 int n = LuaAPI.lua_gettop(L);
-                string s = String.Empty;
 
                 if (0 != LuaAPI.xlua_getglobal(L, "tostring"))
                 {
                     return LuaAPI.luaL_error(L, "can not get tostring in print:");
                 }
 
+                var sb = new StringBuilder();
                 for (int i = 1; i <= n; i++)
                 {
-                    LuaAPI.lua_pushvalue(L, -1);  /* function to be called */
-                    LuaAPI.lua_pushvalue(L, i);   /* value to print */
+                    LuaAPI.lua_pushvalue(L, -1); /* function to be called */
+                    LuaAPI.lua_pushvalue(L, i); /* value to print */
                     if (0 != LuaAPI.lua_pcall(L, 1, 1, 0))
                     {
                         return LuaAPI.lua_error(L);
                     }
-                    s += LuaAPI.lua_tostring(L, -1);
 
-                    if (i != n) s += "\t";
+                    sb.Append(LuaAPI.lua_tostring(L, -1));
 
-                    LuaAPI.lua_pop(L, 1);  /* pop result */
+                    if (i != n) sb.Append("\t");
+
+                    LuaAPI.lua_pop(L, 1); /* pop result */
                 }
-                UnityEngine.Debug.Log("LUA: " + s);
+
+                SimpleLog.Log(sb.ToString());
                 return 0;
             }
             catch (System.Exception e)
@@ -733,7 +739,7 @@ namespace XLua
                         }
                         else
                         {
-                            UnityEngine.Debug.LogWarning("load lua file from StreamingAssets is obsolete, filename:" + filename);
+                            Debug.Log("load lua file from StreamingAssets is obsolete, filename:" + filename);
                             if (LuaAPI.xluaL_loadbuffer(L, www.bytes, www.bytes.Length , "@" + filename) != 0)
                             {
                                 return LuaAPI.luaL_error(L, String.Format("error loading module {0} from streamingAssetsPath, {1}",
@@ -749,7 +755,7 @@ namespace XLua
                     // string text = File.ReadAllText(filepath);
                     var bytes = File.ReadAllBytes(filepath);
 
-                    UnityEngine.Debug.LogWarning("load lua file from StreamingAssets is obsolete, filename:" + filename);
+                    Debug.Log("load lua file from StreamingAssets is obsolete, filename:" + filename);
                     if (LuaAPI.xluaL_loadbuffer(L, bytes, bytes.Length, "@" + filename) != 0)
                     {
                         return LuaAPI.luaL_error(L, String.Format("error loading module {0} from streamingAssetsPath, {1}",

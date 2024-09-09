@@ -13,8 +13,9 @@ using LuaCSFunction = UniLua.CSharpFunctionDelegate;
 #else
 using LuaAPI = XLua.LuaDLL.Lua;
 using RealStatePtr = System.IntPtr;
-using LuaCSFunction = XLua.LuaDLL.lua_CSFunction;
+using LuaCSFunction = XLuaBase.lua_CSFunction;
 #endif
+using UnityEngine;
 
 
 namespace XLua
@@ -115,6 +116,9 @@ namespace XLua
                 AddBuildin("socket.core", StaticLuaCallbacks.LoadSocketCore);
                 AddBuildin("socket", StaticLuaCallbacks.LoadSocketCore);
 #endif
+                
+                AddBuildin("rapidjson", LuaDLL.Lua.LoadRapidJson);
+                AddBuildin("md5", LuaDLL.Lua.LoadMD5);
 
                 AddBuildin("CS", StaticLuaCallbacks.LoadCS);
 
@@ -402,22 +406,23 @@ namespace XLua
             lock (luaEnvLock)
             {
 #endif
-                if (disposed) return;
-                Tick();
+            if (disposed) return;
+            Tick();
 
-                if (!translator.AllDelegateBridgeReleased())
-                {
-                    throw new InvalidOperationException("try to dispose a LuaEnv with C# callback!");
-                }
-                
-                ObjectTranslatorPool.Instance.Remove(L);
+            if (!translator.AllDelegateBridgeReleased())
+            {
+                Debug.Log("try to dispose a LuaEnv with C# callback!");
+                return;
+            }
 
-                LuaAPI.lua_close(L);
-                translator = null;
+            ObjectTranslatorPool.Instance.Remove(L);
 
-                rawL = IntPtr.Zero;
+            LuaAPI.lua_close(L);
+            translator = null;
 
-                disposed = true;
+            rawL = IntPtr.Zero;
+
+            disposed = true;
 #if THREAD_SAFE || HOTFIX_ENABLE
             }
 #endif
@@ -444,6 +449,7 @@ namespace XLua
 #endif
         }
 
+        [XLua.GCOptimize]
         internal struct GCAction
         {
             public int Reference;
@@ -488,7 +494,7 @@ namespace XLua
             end
 
             function metatable:__newindex()
-                error('No such type: ' .. rawget(self,'.fqn'), 2)
+                print('1 ERR::No such type: ' .. rawget(self,'.fqn'), debug.traceback())
             end
 
             -- A non-type has been called; e.g. foo = System.Foo()
@@ -501,7 +507,7 @@ namespace XLua
                         return rawget(CS, gt)
                     end
                 end
-                error('No such type: ' .. fqn, 2)
+                print('2 ERR::No such type: ' .. fqn, debug.traceback())
             end
 
             CS = CS or {}
@@ -597,7 +603,7 @@ namespace XLua
         public delegate byte[] CustomLoader(ref string filepath);
 
         internal List<CustomLoader> customLoaders = new List<CustomLoader>();
-        
+
         //loader : CustomLoader， filepath参数：（ref类型）输入是require的参数，如果需要支持调试，需要输出真实路径。
         //                        返回值：如果返回null，代表加载该源下无合适的文件，否则返回UTF8编码的byte[]
         public void AddLoader(CustomLoader loader)

@@ -10,10 +10,8 @@ namespace GameMain.Scripts
         private IEnumerator Start()
         {
             Instance = this;
-            //yield return LoadGameDll();
-            //yield return RunDll();
-            yield return LoadGameDll2();
-            yield return RunDll2();
+            yield return LoadGameDll();
+            yield return RunDll();
         }
     }
 }
